@@ -7,6 +7,12 @@ services:
       - ./config.yaml:/app/config.yaml
     env_file:
       - .env
+
+    environment:
+      - LITELLM_LOGGING=langfuse
+      - LANGFUSE_PUBLIC_KEY=pk-lf-e3fb03a5-8334-4d60-8dd5-8bd1c61011df
+      - LANGFUSE_SECRET_KEY=sk-lf-742e3fa1-e787-4373-9a2c-affc401de4e1
+      - LANGFUSE_HOST=http://langfuse:3000
     command: ["--config", "/app/config.yaml", "--port", "4000"]
     restart: always
 
@@ -33,6 +39,10 @@ services:
     image: redis:alpine
     ports:
       - "6379:6379"
+    restart: always
+
+  node-exporter:
+    image: prom/node-exporter:latest
     restart: always
 
   langfuse:
