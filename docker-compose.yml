@@ -35,6 +35,17 @@ services:
       - "6379:6379"
     restart: always
 
+  langfuse:
+    image: langfuse/langfuse:2
+    ports:
+      - "3001:3000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - NEXTAUTH_SECRET=kailash123langfuse
+      - SALT=kailash123salt
+      - NEXTAUTH_URL=http://13.235.251.45:3001
+    restart: always
+
 volumes:
   prometheus_data:
   grafana_data:
