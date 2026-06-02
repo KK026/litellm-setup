@@ -16,13 +16,18 @@ model_list:
 
   - model_name: github-gpt4
     litellm_params:
-      model: openai/gpt-4.1
-      api_base: "https://models.github.ai"
+      model: openai/gpt-4o
+      api_base: "https://models.github.ai/inference"
       api_key: "os.environ/GITHUB_API_KEY"
 
 litellm_settings:
   drop_params: True
   set_verbose: False
+  cache: True
+  cache_params:
+    type: redis
+    host: redis
+    port: 6379
 
 general_settings:
   master_key: "os.environ/LITELLM_MASTER_KEY"
