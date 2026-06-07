@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: litellm
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: litellm
+  template:
+    metadata:
+      labels:
+        app: litellm
+    spec:
+      containers:
+      - name: litellm
+        image: ghcr.io/berriai/litellm:main-latest
+        ports:
+        - containerPort: 4000
+        envFrom:
+        - secretRef:
+            name: litellm-secret
+        volumeMounts:
+        - mountPath: /app/config.yaml
+          name: config
+          subPath: config.yaml
+        args: ["--config", "/app/config.yaml", "--port", "4000"]
+      volumes:
+      - name: config
+        configMap:
+          name: litellm-config
