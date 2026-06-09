@@ -1,12 +1,29 @@
 apiVersion: v1
 kind: Service
 metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"litellm","namespace":"default"},"spec":{"ports":[{"port":4000,"targetPort":4000}],"selector":{"app":"litellm"},"type":"ClusterIP"}}
+  creationTimestamp: "2026-06-07T16:56:49Z"
   name: litellm
   namespace: default
+  resourceVersion: "64391"
+  uid: 3436cefc-51e6-46c0-867d-01db369f94ae
 spec:
+  clusterIP: 10.100.14.138
+  clusterIPs:
+  - 10.100.14.138
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - port: 4000
+    protocol: TCP
+    targetPort: 4000
   selector:
     app: litellm
-  ports:
-    - port: 4000
-      targetPort: 4000
+  sessionAffinity: None
   type: ClusterIP
+status:
+  loadBalancer: {}
