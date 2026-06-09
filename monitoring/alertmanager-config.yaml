@@ -1,0 +1,20 @@
+global:
+  resolve_timeout: 5m
+  smtp_smarthost: 'smtp.zoho.in:587'
+  smtp_from: 'YOUR_EMAIL@zohomail.in'
+  smtp_auth_username: 'YOUR_EMAIL@zohomail.in'
+  smtp_auth_password: 'YOUR_ZOHO_PASSWORD_HERE'
+  smtp_require_tls: true
+receivers:
+- name: "null"
+- name: "email-alerts"
+  email_configs:
+  - to: 'YOUR_EMAIL@zohomail.in'
+    send_resolved: true
+route:
+  receiver: "email-alerts"
+  repeat_interval: 12h
+  routes:
+  - matchers:
+    - alertname = "Watchdog"
+    receiver: "null"

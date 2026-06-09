@@ -1,0 +1,8 @@
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install monitoring prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --create-namespace
+
+# Chart version: kube-prometheus-stack-86.2.0
+# Uninstall: helm uninstall monitoring -n monitoring
