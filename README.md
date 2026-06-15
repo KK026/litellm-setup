@@ -3,19 +3,22 @@
 Production-grade LLM Gateway deployed on AWS EKS with full observability stack.
 
 ## Architecture
-
-```
 Internet → FreeDNS → AWS ELB → Nginx Ingress Controller
-                                    ├── LiteLLM      (kailashtech.chickenkiller.com)
-                                    ├── Grafana      (kailashgrafana.chickenkiller.com)
-                                    └── Langfuse     (kailashlangfuse.chickenkiller.com)
 
+├── LiteLLM      (kailashtech.chickenkiller.com)
+
+├── Grafana      (kailashgrafana.chickenkiller.com)
+
+└── Langfuse     (kailashlangfuse.chickenkiller.com)
 LiteLLM → Redis          (Response Caching)
+
 LiteLLM → Langfuse       (LLM Traces)
+
 LiteLLM → Prometheus     (Metrics)
+
 Prometheus → Grafana     (Dashboards)
+
 Alertmanager → Zoho Mail (Incident Alerts)
-```
 
 ## Stack
 
@@ -57,33 +60,39 @@ Alertmanager → Zoho Mail (Incident Alerts)
 - EKS cluster running
 
 ### 1. Configure kubectl
+
 ```bash
 aws eks update-kubeconfig --region ap-south-1 --name kailash-k8s
 ```
 
 ### 2. Install Nginx Ingress Controller
+
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.11.1/deploy/static/provider/aws/deploy.yaml
 ```
 
 ### 3. Install cert-manager
+
 ```bash
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.0/cert-manager.yaml
 ```
 
 ### 4. Create Secret and ConfigMap
+
 ```bash
 kubectl create secret generic litellm-secret --from-env-file=.env
 kubectl create configmap litellm-config --from-file=config.yaml
 ```
 
 ### 5. Deploy Redis
+
 ```bash
 kubectl create deployment redis --image=redis:alpine
 kubectl expose deployment redis --port=6379 --type=ClusterIP
 ```
 
 ### 6. Deploy LiteLLM
+
 ```bash
 kubectl apply -f eks/litellm-deployment.yaml
 kubectl apply -f eks/litellm-service.yaml
@@ -91,6 +100,7 @@ kubectl apply -f eks/litellm-ingress.yaml
 ```
 
 ### 7. Deploy Monitoring Stack
+
 ```bash
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm install monitoring prometheus-community/kube-prometheus-stack \
@@ -99,11 +109,23 @@ kubectl apply -f eks/grafana-ingress.yaml
 ```
 
 ### 8. Deploy Langfuse
+
 ```bash
-helm repo add langfuse https://langfuse.github.io/langfuse-k8s
-helm install langfuse langfuse/langfuse \
-  --namespace langfuse --create-namespace \
-  -f eks/langfuse-values.yaml
+kubectl create namespace langfuse
+
+kubectl create secret generic langfuse-secret \
+  --namespace langfuse \
+  --from-literal=DATABASE_URL='your-supabase-url' \
+  --from-literal=NEXTAUTH_SECRET='your-secret' \
+  --from-literal=SALT='your-salt' \
+  --from-literal=ENCRYPTION_KEY='your-key' \
+  --from-literal=NEXTAUTH_URL='https://kailashlangfuse.chickenkiller.com' \
+  --from-literal=REDIS_HOST='langfuse-redis' \
+  --from-literal=REDIS_PORT='6379'
+
+kubectl apply -f eks/langfuse-deployment.yaml
+kubectl apply -f eks/langfuse-service.yaml
+kubectl apply -f eks/langfuse-ingress.yaml
 ```
 
 ## Live URLs
